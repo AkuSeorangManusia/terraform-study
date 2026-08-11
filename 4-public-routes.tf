@@ -6,9 +6,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.andimsum.id
   }
 
-  tags = {
-    Name = "andimsum-public-rt"
-  }
+  tags = merge(local.common_tags, { Name = "${local.name_prefix}-public-rt" })
 }
 
 resource "aws_route_table_association" "public" {

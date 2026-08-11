@@ -6,9 +6,7 @@ resource "aws_route_table" "private" {
     network_interface_id = aws_instance.edge1.primary_network_interface_id
   }
 
-  tags = {
-    Name = "andimsum-private-rt"
-  }
+  tags = merge(local.common_tags, { Name = "${local.name_prefix}-private-rt" })
 }
 
 resource "aws_route_table_association" "private" {

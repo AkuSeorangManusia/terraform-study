@@ -1,5 +1,5 @@
 output "edge1_public_ip" {
-  value       = aws_instance.edge1.public_ip
+  value = aws_instance.edge1.public_ip
 }
 
 output "private_host_ips" {
