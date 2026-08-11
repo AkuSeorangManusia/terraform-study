@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "internal" {
-  name = "andimsum.internal"
+  name = var.private_dns_zone
 
   vpc {
     vpc_id = aws_vpc.andimsum.id

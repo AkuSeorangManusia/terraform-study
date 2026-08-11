@@ -14,13 +14,13 @@ data "aws_ami" "amazon_linux_2023" {
 }
 
 resource "aws_key_pair" "andimsum" {
-  key_name   = "andimsum-key"
-  public_key = file(pathexpand(var.key_file_path))
+  key_name   = "${local.name_prefix}-key"
+  public_key = file(var.ssh_public_key_path)
 }
 
 resource "aws_instance" "edge1" {
   ami                         = data.aws_ami.amazon_linux_2023.id
-  instance_type               = var.instance_types["edge1"]
+  instance_type               = var.instance_types[local.edge_host_name]
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.edge1.id]
   associate_public_ip_address = true
@@ -38,23 +38,23 @@ resource "aws_instance" "edge1" {
     systemctl enable iptables
   EOF
 
-  tags = { 
-    Name = "ec2-edge1" 
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-ec2-${local.edge_host_name}"
     Role = "edge"
-  }
+  })
 }
 
 resource "aws_instance" "private_workloads" {
-  for_each = toset(["mon1", "ci1", "f1", "m1"])
+  for_each = local.private_workload_instance_types
 
   ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = var.instance_types[each.key]
+  instance_type          = each.value
   subnet_id              = aws_subnet.private.id
   vpc_security_group_ids = [aws_security_group.private_workloads.id]
   key_name               = aws_key_pair.andimsum.key_name
 
-  tags = {
-    Name = "ec2-${each.key}"
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-ec2-${each.key}"
     Role = each.key
-  }
+  })
 }

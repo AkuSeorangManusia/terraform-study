@@ -1,45 +1,55 @@
 variable "aws_region" {
-  type    = string
-  default = "ap-southeast-3"
+  type = string
 }
 
 variable "availability_zone" {
-  type    = string
-  default = "ap-southeast-3a"
+  type = string
+}
+
+variable "project_name" {
+  type = string
+}
+
+variable "environment" {
+  type = string
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.20.0.0/16"
+  type = string
 }
 
-variable "public_subnet_cidr" {
-  type    = string
-  default = "10.20.1.0/24"
+variable "subnet_cidrs" {
+  type = map(string)
+
+  validation {
+    condition     = alltrue([for subnet in ["public", "private"] : contains(keys(var.subnet_cidrs), subnet)])
+    error_message = "subnet_cidrs must specify public and private ranges."
+  }
 }
 
-variable "private_subnet_cidr" {
-  type    = string
-  default = "10.20.2.0/24"
+variable "ssh_public_key_path" {
+  type = string
+}
+
+variable "ssh_allowed_cidrs" {
+  type = list(string)
+}
+
+variable "private_dns_zone" {
+  description = "Route 53 name"
+  type        = string
 }
 
 variable "instance_types" {
-  type        = map(string)
-  default = {
-    edge1 = "t3.micro"
-    f1    = "t3.micro"
-    m1    = "t3.micro"
-    ci1   = "t3.small"
-    mon1  = "t3.small"
-  }
+  type = map(string)
 
   validation {
-    condition     = alltrue([for host in ["edge1", "f1", "m1", "ci1", "mon1"] : contains(keys(var.instance_types), host)])
-    error_message = "instance_types must specify edge1, f1, m1, ci1, and mon1."
+    condition     = contains(keys(var.instance_types), "edge1")
+    error_message = "instance_types must specify edge1."
   }
 }
 
-variable "key_file_path" {
-  type    = string
-  default = "~/.ssh/id_rsa.pub"
+variable "additional_tags" {
+  type    = map(string)
+  default = {}
 }

@@ -8,13 +8,7 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket         = "andimsum-tfstate"
-    key            = "terraform.tfstate"
-    region         = "ap-southeast-3"
-    dynamodb_table = "terraform-locks"
-    encrypt        = true
-  }
+  backend "s3" {}
 }
 
 provider "aws" {
