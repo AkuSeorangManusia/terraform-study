@@ -22,5 +22,3 @@ jobs:
             - run: terraform init -backend=false
     
             - run: terraform validate
-    
-            - run: terraform plan
