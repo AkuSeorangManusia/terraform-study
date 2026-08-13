@@ -81,14 +81,14 @@ jobs:
         permissions:
             contents: read
             id-token: write
-            
+
         steps:
             - uses: actions/checkout@v4
 
             - uses: actions/download-artifact@v4
               with:
                   name: tfplan
-                  path: .
+                  path: environments/dev
 
             - uses: hashicorp/setup-terraform@v4
               with:
