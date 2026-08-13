@@ -21,27 +21,30 @@ defaults:
 jobs:
     plan:
         runs-on: ubuntu-latest
+
         environment: dev
+
         permissions:
             contents: read
             id-token: write
+
         steps:
             - uses: actions/checkout@v4
-            - uses: actions/upload-artifact@v4
-              with:
-                  name: tfplan
-                  path: tfplan
+
             - uses: hashicorp/setup-terraform@v4
               with:
                   terraform_version: latest
                   terraform_wrapper: false
+
             - uses: aws-actions/configure-aws-credentials@v6
               with:
                   role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
                   aws-region: ${{ vars.AWS_REGION }}
+
             - run: printf '%s' "$TF_VARS" > dev.auto.tfvars
               env:
                   TF_VARS: ${{ secrets.TF_VARS }}
+
             - run: |
                   terraform init -input=false -reconfigure \
                     -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
@@ -49,41 +52,64 @@ jobs:
                     -backend-config="region=${{ vars.AWS_REGION }}" \
                     -backend-config="encrypt=true" \
                     -backend-config="use_lockfile=true"
+
+            - run: terraform fmt -check -recursive
+
             - run: terraform validate -no-color
+
             - run: terraform plan -input=false -out=tfplan
+
+            - run: terraform show -no-color tfplan > tfplan.txt
+
+            - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: tfplan
+                  path: |
+                    environments/dev/tfplan
+                    environments/dev/tfplan.txt
 
     apply:
         needs: plan
-        if: github.event_name == 'workflow_dispatch'
+
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
         runs-on: ubuntu-latest
+
         environment: dev
+
         permissions:
             contents: read
             id-token: write
+
         steps:
             - uses: actions/checkout@v4
+
             - uses: actions/download-artifact@v4
               with:
                   name: tfplan
-                  path: .
+                  path: environments/dev
+
             - uses: hashicorp/setup-terraform@v4
               with:
                   terraform_version: latest
                   terraform_wrapper: false
+
             - uses: aws-actions/configure-aws-credentials@v6
               with:
                   role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
                   aws-region: ${{ vars.AWS_REGION }}
-            - name: Create the environment input file
-              run: printf '%s' "$TF_VARS" > dev.auto.tfvars
+                  
+            - run: printf '%s' "$TF_VARS" > dev.auto.tfvars
               env:
                   TF_VARS: ${{ secrets.TF_VARS }}
-            - name: Initialize remote state
-              run: |
+
+            - run: |
                   terraform init -input=false -reconfigure \
                     -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
                     -backend-config="key=${{ vars.TF_STATE_KEY }}" \
                     -backend-config="region=${{ vars.AWS_REGION }}" \
                     -backend-config="encrypt=true" \
                     -backend-config="use_lockfile=true"
+
             - run: terraform apply -input=false -auto-approve tfplan
