@@ -1,0 +1,9 @@
+variable "name_prefix" { type = string }
+variable "common_tags" { type = map(string) }
+variable "public_subnet_id" { type = string }
+variable "private_subnet_id" { type = string }
+variable "edge_security_group_id" { type = string }
+variable "private_security_group_id" { type = string }
+variable "key_name" { type = string }
+variable "edge_instance_type" { type = string }
+variable "private_workload_instance_types" { type = map(string) }

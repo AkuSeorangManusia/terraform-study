@@ -1,0 +1,10 @@
+aws_region        = "ap-southeast-3"
+availability_zone = "ap-southeast-3a"
+project_name      = "andimsum"
+environment       = "dev"
+vpc_cidr          = "10.20.0.0/16"
+subnet_cidrs      = { public = "10.20.1.0/24", private = "10.20.2.0/24" }
+ssh_public_key    = "ssh-ed25519 AAAA... "
+ssh_allowed_cidrs = ["0.0.0.0/0"]
+private_dns_zone  = "andimsum.internal"
+instance_types    = { edge1 = "t3.micro", f1 = "t3.micro", m1 = "t3.micro", ci1 = "t3.small", mon1 = "t3.small" }

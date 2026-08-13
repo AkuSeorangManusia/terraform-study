@@ -11,6 +11,11 @@ crash.*.log
 *.tfvars.json
 !*.tfvars.example
 backend.hcl
+environments/*/backend.hcl
+environments/*/*.tfvars
+!environments/*/*.tfvars.example
+environments/*/keys/
+environments/*/state/
 
 override.tf
 override.tf.json
