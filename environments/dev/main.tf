@@ -21,6 +21,13 @@ module "subnets" {
   availability_zone = var.availability_zone
 }
 
+module "nat_gateway" {
+  source           = "../../modules/network/nat_gateway"
+  name_prefix      = local.name_prefix
+  common_tags      = local.common_tags
+  public_subnet_id = module.subnets.public_id
+}
+
 module "public_route_table" {
   source              = "../../modules/network/public_route_table"
   name_prefix         = local.name_prefix
