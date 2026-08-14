@@ -25,7 +25,7 @@ AWS Terraform configuration for my things and study purposes
   │ │                                             │ │ 
   │ │      ┌───────────┐      ┌───────────┐       │ │ 
   │ │      │           │      │           │       │ │ 
-  │ │      │  ec2-f1   │      │  ec2-n1   │       │ │ 
+  │ │      │  ec2-f1   │      │  ec2-m1   │       │ │ 
   │ │      │           │      │           │       │ │ 
   │ │      └───────────┘      └───────────┘       │ │ 
   │ └─────────────────────────────────────────────┘ │ 
@@ -42,10 +42,6 @@ outputs. Infrastructure is separated into reusable local modules:
 - `modules/network/security_groups` — edge and private host access rules.
 - `modules/key_pair` — EC2 SSH public-key registration.
 - `modules/ec2` — NAT edge host and private hosts.
-
-`environments/dev/moved.tf` preserves the previous module addresses during this
-refactor. Keep it committed until the existing `dev` state has applied this
-refactor.
 
 ## Usage
 
